@@ -48,7 +48,7 @@ The prompt seems to allude to decoding the file using another base. Probably Bas
 
 FFFF in hexadecimal = 65535 in decimal. 65535 + 1 = 65536. So I think we are boing to decode using 65536. Now I just needed to find out how to decode with that base.
 
-Online, I found (this repository)[https://github.com/Parkayun/base65536] that somebody creatd to encode & decode base65536 using python. After installing this with pip, I wrote this small python script to decode our file:
+Online, I found [this repository](https://github.com/Parkayun/base65536) that somebody creatd to encode & decode base65536 using python. After installing this with pip, I wrote this small python script to decode our file:
 
 ```
 import base65536
@@ -64,7 +64,54 @@ This gave me this message (flag redacted of course):
 `b'Nice work! We might have played with too many bases here... 0xFFFF is 65535, 65535+1 is 65536! Well anyway, here is your flag:\r\n\r\nflag{INSERT_FLAG_HERE}'`
 
 ### Traffic
-Looks like we're analyzing network traffic. I was thinking I could just use wireshark which I'm comfortable with, but it's not the right file type. The prompt suggests using rita or zeek.
+Looks like we're analyzing network traffic. I was thinking I could just use wireshark which I'm comfortable with, but it's not the right file type. The prompt suggests using Rita or Zeek.
 
-I chose to try zeek because it starts with a z which is kind of fun.
+I chose to try Rita.
 
+Rita stands for Real Intelligence Threat Analytics and is a framework to analyze network traffic to look for malicious traffic.
+
+The hardest part of this challenge was setting up Rita in WSL. I'll go over those steps since that's what took the longest.
+
+1. Download the [repo](https://github.com/activecm/rita.git) from GitHub
+2. If  you are on supported OS use the install.sh script to install `sudo ./install.sh` Theoretically you could use --disable-zeek to save some time.
+3. WSL is kind of supported for debian. You will see an error about systemd not being usable or something. This is becuase WSL uses some other mechanism. We'll get past this issue in a minute.
+4. Modify /etc/rita/config.yaml to include the correct address for your local subnet
+
+If you try to use rita import \<log directory\> at this point, you will get and error saying the databases can't be reached. This is because MongoDB could not be setup to automatically run.
+
+5. Run `sudo mongod` to start the MongoDB server. (Put in background or open another terminal)
+6. Now run `rita import \<log directory\> \<name of new DB\>`
+
+It should now work, the logs will be analyzed (Note rita can handle the .gz files so no need to extract them)
+
+7. `rita html-report \<name of DB\>`
+
+You can now view the html report by opening the generated index.html file in your browser.
+
+The trick to this CTF is to look through each line searching for  "sketchy site". In the "Beacons SNI" tab of the report you can see the website names and looking through the list we see "sketchysite.github.io".
+
+Going to this site produces the flag
+
+### CeaserMirror
+The prompt here gives the hint that it is a clever ROT13. So I took the contents of the file and dropped them into CyberChef, chose ROT13, and baked it.
+
+The output was half readable, but the other half was backwards. Rather than try to flip the text to make it easier to read, I just started to read it backwards.
+
+You have to start with the firts forward-facing line, and when you get to the backwards piece, start reading from the very end. It's kind of a fun exercise, if a little slow going. The flag has been split into three parts and the parts in the backwards text will have to be reversed in the actual flag.
+
+### I Won't Let You Down
+Okay, so this one took me much longer than it should have. I went to the website and watched the video. The website basically tells you to use nmap. So I did that and found 4 ports open:
+
+```
+PORT     STATE    SERVICE
+22/tcp   open     ssh
+80/tcp   open     http
+646/tcp  filtered ldp
+8888/tcp open     sun-answerbook
+```
+
+The first 3 look normal to me, and I know the CTF said don't use ssh. So my immediate thought was to try going to port 8888. It didn't load in the browser, or at least it just spun, so I decided to try to just use curl. 
+
+Curl gave me an error saying http 0.9 isn't allowed. When I looked this error up, I found people saying to check if wget gave you more. 
+
+When I ran wget on that port, it started fetching an html file. I let this download for a while before I decided it was probably just spinning. But when I checked the html file I had pulled down, it contained the lyrics to the song and at the very end the flag.

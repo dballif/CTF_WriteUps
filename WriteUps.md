@@ -115,3 +115,50 @@ The first 3 look normal to me, and I know the CTF said don't use ssh. So my imme
 Curl gave me an error saying http 0.9 isn't allowed. When I looked this error up, I found people saying to check if wget gave you more. 
 
 When I ran wget on that port, it started fetching an html file. I let this download for a while before I decided it was probably just spinning. But when I checked the html file I had pulled down, it contained the lyrics to the song and at the very end the flag.
+
+### Zerion
+This is the first "Malware Analysis" challenge of the competition and I'm pretty excited. I haven't done much malware analysis to this point, but it's always been something I'm super interested in.
+
+So I downloaded the file onto my VM and then cut the network to it to make sure I was being at least a little safe. There was a warning in the challenge that this is based on a real malware sample that they have defanged, but they still urge us to use caution. I think that is so cool.
+
+So my first step was to run `file` on the file to see what it actually is. It's a php script. 
+
+I then used `cat zerion` to find out what is in the script to see if I can find out what they are doing. This returned a massive jumble of characters that started with this a intelligible text:
+
+```
+<?php $L66Rgr=explode(base64_decode("Pz4="),file_get_contents(__FILE__)); $L6CRgr=array(base64_decode("L3gvaQ=="),base64_decode("eA=="),base64_decode(strrev(str_rot13($L66Rgr[1]))));$L7CRgr = "d6d666e70e43a3aeaec1be01341d9f9d";preg_replace($L6CRgr[0],serialize(eval($L6CRgr[2])),$L6CRgr[1]);exit();?>
+```
+
+This was followed by the seemingly gobbledygook. I have left it out since it's partly real malware. But we'll come back to it soon.
+
+I recognized a few things right off the bat: the php heading, a couple of variables, some encoding, etc.
+
+I broke it into it's variables to decipher what is going on.
+
+$L66Rgr is pretty easy to decipher. It's creating an array from a string using the explode function, the delimeter is just encoded in base64 but it turns out it is "?>". The string to be broken is loaded using file_get_contents and is using this php file. So it's grabbing that log string of gobbledygook.
+
+$L6CRgr is an array. The first two entries are just base64 encoded as well so quickly decoded to be /x/i, and x. The last entry was a little more fun. It's a combination of a few different obfuscation techniques.
+
+`base64_decode(strrev(str_rot13($L66Rgr[1])))`
+
+So it's referring back to the gobbledygook. I dropped it into cyberchef and then worked backwards on obfuscation methods. Rot13 -> reverse order -> base64 decode. Now I see it is actually a rather large chunk of code.
+
+$L7CRgr is just a string. Nothing special there yet. I'm sure we'll get to using it.
+
+Then the script calls `preg_replace($L6CRgr[0],serialize(eval($L6CRgr[2])),$L6CRgr[1]);` before finishing.
+
+This referes back to our previous work. preg_replace is a php function that uses a pattern to serach and replace a string. It is case-insensitive. And is called like so:
+
+`preg_replace(<Pattern>,<Replacement String>,<String to act upon>)`
+
+
+So the pattern we are searching for is the first entry of $L6CRgr which is /x/i  
+We are replacing it with the serialized version of the gobbledygook (evaluated as php code), and the string to be replaced is x. Interesting. I'm not exactly sure what this will do, because from what I can tell it's replacaing things in string 'x' which doesn't exist. At least not that I can see at this point. Maybe I'll come back to it.
+
+Coming back to $LCRgr, I see it in the php function that we have already decoded, so I drop it's value in.
+
+Then I just have to decode the php function I have found.
+
+For my sanity, I like to start out by making the code more readable by stylizing it. I just go through and add returns and indents in ways that make sense for reading softare. For example, after a semi-colon, there will be a return, curly brackets should be lined up with the corresponding bracket, etc. 
+
+As I went through the code doing this, I stumbled across the flag!

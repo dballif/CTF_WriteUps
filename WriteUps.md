@@ -241,3 +241,46 @@ I then dropped this newly deobfuscated base64 string into CyberChef base64 decod
 
 and got a ton more code. I was going to go through the same readability steps I normally do, but I figured I could just scan for any flags, or base64 encoded strings. I didn't find a flag, but I did find another base64 encoded string. Decoding it gave me a URL with a parameter encoded_flag=\<Percent Encoded String\>. I had a suspicion that this was probably the flag, so I dropped the encoded string into CyberChef and used URL Decode to decoded the percent encoded values. And, as I suspected, it was the flag.
 
+### Dialtone
+The prompt and name here suggest that the .wav file contains dial tones. Searching online I found a python repository called [dtmf](https://github.com/ribt/dtmf-decoder.git) that takes a .wav file containing dialtones and translates them to numbers.
+
+I got a very long string of numbers out. The next step I knew would be to decode it somehow, it was just a matter of finding how. 
+
+I was pretty sure it wasn't base64 since it was just numbers but I tried it anyway. As I suspected that didn't work. I just started to move through al sorts of decoders with no results. Finally, I tried to treat it as a bigInt as if it was in Java. So I found a quick Java function online that converted a big int to hexadecimal. Then I converted the hexadecimal back to it's raw value and got the flag.
+
+### PHP Stager
+I started this malware sample as I always do, making it readable.
+
+After doing this I found some easy variable substitutions, a function, and a giant string of seemingly random values.
+
+The variable substitutions after the giant block of text led me to find two new variables. They were constructed by taking the character at the specified value.
+
+So afte the first variable substitution I had:
+```
+foreach([24,4,26,31,29,2,37,20,31,6,1,20,31] as $k){
+   $fsPwhnfn8423 .= ")o4la2cih1kp97rmt*x5dw38b(sfy6;envguz_jq/.0"[$k];
+```
+
+Following the numbers in k this ended up being: "base64_encode". 
+I also did this to get "strrev" for another variable. I then substituted this to get a "create_function".
+
+After all those variable substitutions I got:
+
+```
+$c = create_function("/*XAjqgQvv4067*/", base64_encode( deGRi(base64_encode($gbaylYLd6204), "tVEwfwrN302")));
+```
+
+Where "$gbaylYLd6204" is the huge block of text.
+
+`deGRi` is a function that is created at the top that takes two strings and iterates over them taking the XOR of two characters. So basically, this function decodes the huge block of text for us.
+
+This is where things got really tricky for me. I had to find a way to get the decoded text block. I was close, but it was going to be a very long decode process by hand. My choices were write a script, or run the create_function to get out the text.
+
+Well, I decided running it would be best. So what I did is I copied the entire php program into a php sandbox online, removed the final run statement, and added `echo($fsPwhnfn8423( deGRi($fsPwhnfn8423($gbaylYLd6204), "tVEwfwrN302")));`
+which i knew would print out the decoded block of text.
+
+(Note: create_function was removed in php8, so I had to find a sandbox that would allow me to run php7)
+
+This ended up being a perl script and it was very long. I started looking through and noted a password as well as some base64 encoded values. Those are always suspicious in a CTF so I decoded them and found some more scripts. Probably to run a webshell.
+
+But within one of those base64 strings, I saw another kind of encoding for a smaller string. Something called uuencode. I hadn't heard of this before, but I figured they were telling us what it was encoded with so I might as well try. I dropped it into dcode and found the flag.

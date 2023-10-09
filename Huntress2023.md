@@ -454,3 +454,4 @@ To solve this one, I ran `file` on it to see if it was anything special. It was 
 Seeing that it was a .jpg, the first thing I did was run `exiftool` on it. I looked through all the meatadata for the image and I noticed that in the description field, there was a string that looked like it might be base64. I decoded it using `echo "INSERT BASE64 HERE" | base64 -d` to get the flag.
 
 This could also be solved by openign the properties of the picture in Windows, and going to the details tab.
+

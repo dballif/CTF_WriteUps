@@ -442,3 +442,15 @@ A quick excerpt: "The username and password are encrypted using PKCS #11 cryptog
 (The author also has an [article](https://ohyicong.medium.com/how-to-hack-chrome-password-with-python-1bedc167be3d) for a similiar Chrome problem)
 
 For good measure, I ran this firefox tool on my own passwords just to practice. That's cool. And conerning.
+
+### Chicken Wings
+>**Prompt:** I ordered chicken wings at the local restaurant, but uh... this really isn't what I was expecting...
+
+To solve this one, I ran `file` on it to see if it was anything special. It was just some sort of UTF-8 format. Opening it in the terminal wasn't doing me any good. When I opened it in a file editor. I realized it was the font "Wingdings". I dropped it into a translator and got the flag.
+
+### Where Am I
+>**Prompt:** Your friend thought using a JPG was a great way to remember how to login to their private server. Can you find the flag?
+
+Seeing that it was a .jpg, the first thing I did was run `exiftool` on it. I looked through all the meatadata for the image and I noticed that in the description field, there was a string that looked like it might be base64. I decoded it using `echo "INSERT BASE64 HERE" | base64 -d` to get the flag.
+
+This could also be solved by openign the properties of the picture in Windows, and going to the details tab.

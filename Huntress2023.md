@@ -455,3 +455,36 @@ Seeing that it was a .jpg, the first thing I did was run `exiftool` on it. I loo
 
 This could also be solved by openign the properties of the picture in Windows, and going to the details tab.
 
+### Wimble
+>**Prompt:** "Gretchen, stop trying to make fetch happen! It's not going to happen!" - Regina George, Mean Girls
+
+This one was new to me. When I unzipped the file for the challenge, I found it was a Windows Image File. Basically another archive containing an image taken from windows. I extracted that archive so I could look through it.
+
+There were a lot of files here, and I didn't really know what any of them were.
+
+I see a lot of .pf files and another .zip file.
+
+It looks like the .pf files are related to various .exe files based on their titles. I decided I needed to find out what they were. .pf stands for "Prefetch". From what I read, these files are created the first time any .exe is run, and they contain important pieces of data that help the OS start them faster. That's pretty high level, but I think it's good enough for us.
+
+So now that I knew what they were, I had to find out how to search through them. My guess is that the flag is hidden inside one of them, but it could be in the zip.
+
+Time for more research. I eventually found [PECmd](https://ericzimmerman.github.io/#!index.md) a tool written by Eric Zimmerman that parses prefetch files. All I had to dow was pass it the directory where I extracted them all and it would look through them all, sending them to a file of my choosing. Then I could just searc for a flag.
+
+`Downloads\PECmd -d Downloads\fetch~\fetch >> pf.out.txt`
+
+I moved it to my WSL instance to grep because I know how to use that one off the top of my head.
+
+`cat pf.out.txt | grep flag{`
+
+This did turn up the flag for me.
+
+### F12:
+>**Prompt:** Remember when Missouri got into hacking!?! You gotta be fast to catch this flag!
+
+Starging this link displays a button, when you press it, another window appears for a second and then disappears. I assume the flag is goign to be in this window somewhere.
+
+However, you get a very small portion of the window. My first thought was that I would actually just have to be really fast and resize the window. I tried this a few times before I realized it was futile.
+
+So then I tried right clicking on it quickly, hoping I could get the page source. But that didn't work either.
+
+So finally I inspected the main page source to see what it was doing. When the button was clicked, it would call a JS function that would open `"./capture_the_flag.html"`. So, I navigated to that website manually where was a big green square where the flag should have been. But it wasn't there, so I viewed that page source too and found the flag hidden under a bunch of blank lines.

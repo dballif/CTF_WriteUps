@@ -488,3 +488,40 @@ However, you get a very small portion of the window. My first thought was that I
 So then I tried right clicking on it quickly, hoping I could get the page source. But that didn't work either.
 
 So finally I inspected the main page source to see what it was doing. When the button was clicked, it would call a JS function that would open `"./capture_the_flag.html"`. So, I navigated to that website manually where was a big green square where the flag should have been. But it wasn't there, so I viewed that page source too and found the flag hidden under a bunch of blank lines.
+
+### VeeBeeEeee
+>**Prompt:** While investigating a host, we found this strange file attached to a scheduled task. It was invoked with wscript or something... can you find a flag?  
+NOTE, this challenge is based off of a real malware sample. We have done our best to "defang" the code, but out of abudance of caution it is strongly encouraged you only analyze this inside of a virtual environment separate from any production devices.
+
+Anothe malware challenge, this time it is using something called wscript. I'm not super well versed in windows tools, so I didn't know what this was right away. I looked it up though and it appears just to be a tool to run different kinds of scripts.
+
+I opened up the file to see if I could see anything. It's looking pretty encrypted or something. However, I did notice there are two cases of ==, one at the start and one at the end. Each with some characters before or after. Maybe some kind of tag or id. I don't know yet. I kept looking around and found that these tags were indicators that it is an endoed vbs script (aka .vbe). I looked online and found (John Hammond's decoder)[https://github.com/JohnHammond/vbe-decoder.git].
+
+Using this converted it to mostly readable. There were a few strings and characters I had to clean up.
+
+First I found and replaced all instances of `''''''''''''''''al37ysoeopm'al37ysoeopm` with nothing. That made it a lot easier on the eyes. 
+Then I found and repalced all instance of ampersand(`&`) with nothing. This made the variables readable. 
+
+Then I just had to combine multiple variables to see what the script was doing. I didn't immediately notice a flag or any base64 encoded text, but I did see a `InvokeWebRequest` that was grabbing a file from Pastebin. So I followed the Pastebin link and found the flag.
+
+### Baking
+>**Prompt:** Do you know how to make cookies? How about HTTP flavored?
+
+When I visited the website that came along with this challenge, it brought me to a giant oven with various recipe buttons I could press. When I clicked them, it would set the time. According to the page source, this time was based in some way off the current time. 
+
+The last recipe, `magic cookies` seemed suspicious in thre parts.
+1. It was called magic cookies instead of just cookies
+2. The timer would set to 119 hours which seemed very unreasonable
+3. The prompt calls out cookies
+
+I couldn't find a way to edit this time initially, until I realized the prompt was pushing me towards looking at the cookies.
+
+I opened `Chrome Dev Tools > Application > Storage > Cookies` and sure enough there was a cookie there containing three fields.
+
+The first and third I did not recognize, but the second was called `in-oven` and contained this base64 encoded string: `eyJyZWNpcGUiOiAiTWFnaWMgQ29va2llcyIsICJ0aW1lIjogIjEwLzExLzIwMjMsIDAxMzoxMzowMCJ9==`
+
+When I decoded this, it became `{"recipe": "Magic Cookies", "time": "10/11/2023, 013:13:00"}`.
+
+So it appears this cookie was telling me how long my oven had left to bake those magic cookies. I edited this field to be ten days ago so that the timer would expire, re-encoded the value, put it into the cookie and refreshed my page. A popup with the flag appeared.
+
+**Note:** I tested afterwards to see if I had to use "Magic Cookiess" and this is the case. The others will display a popup, but there will be no flag.

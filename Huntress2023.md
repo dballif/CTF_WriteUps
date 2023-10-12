@@ -525,3 +525,43 @@ When I decoded this, it became `{"recipe": "Magic Cookies", "time": "10/11/2023,
 So it appears this cookie was telling me how long my oven had left to bake those magic cookies. I edited this field to be ten days ago so that the timer would expire, re-encoded the value, put it into the cookie and refreshed my page. A popup with the flag appeared.
 
 **Note:** I tested afterwards to see if I had to use "Magic Cookiess" and this is the case. The others will display a popup, but there will be no flag.
+
+
+### Operation Not Found
+>**Prompt:** In the boundless web of data, some corners echo louder than others, whispering tales of innovation, deep knowledge, and fierce competition. On the lush landscapes of https://osint.golf/, a corner awaits your discovery... where intellect converges with spirit, and where digital foundations stand alongside storied arenas.  
+This is the chall1 challenge for the "HuntressCTF2023" challenges on https://osint.golf. It's a lot like Geoguesser if you have ever played :)  
+Navigate to OSINT Golf and select the chall1 challenge.  
+You will see an interface similar to Google Street View, where you can look around and zoom in on your surroundings. Try and determine your location on the map of the earth!  
+Move your mouse over the minimap in the bottom-right corner, and scroll to zoom or click and hold to pan around the map.  
+Click and place your pin-marker on the map where you believe your exact location is. The accuracy radius is 200 meters.  
+Click Submit. If you are incorrect, it will say "not here" on the top left. If you are correct, your flag will be displayed in the top-left corner.  
+Copy and paste the flag value into the input box below and submit it to solve this challenge!  
+
+I liked this challenge. I'm not sure how to write this one up very well, so I'll just share some of my observations and how they helped me find the right answer.
+
+The first identifying information I saw was a sign for "Brasfield & Gorrie". It looked to be a construction company. I looked them up on google and found they are indeed a construction company based out of Alabama. This plus the fact that everything is in English is a good indicator we are in the US somwhere. But the company also notes they work around the country so I may not be in Alabama.
+
+Looking around, there are only a few othr things that stick out to me. First, there are some tall buildings, like skyscrapers. Second, we appear to be near a stadum of some sort. Three, there are lots of young people with backpacks.
+
+Based on these observations, I think we're in at least a decent sized city since there are skyscrapers. Based on the youg people, their backpacks and a stadium, I think we are at some college. The more I look the more I think this is true, the buildings have that feel and it looks liek a well maintained campus.
+
+At this point, I checked a few colleges in Alabama, but didn't see any tall buildings, so that didn't seem right.
+
+I came back to the picture and noticed that two of the possible students are wearing yellow & black stripes. I figured this was a good sign that it was the school colors. After some searching, I found a few possible candidates that used that color. For each, I went to a map of their school and checked around the stadium.
+
+I eventually found it was Georgia Tech, by seeing some one way streets near the stadium.
+
+After the fact, I noticed in the picture that I could see their Logo on one sign, but it was pretty blurry, so without a little push in that direction I don't think I would've been able to recognize it.
+
+### Snake Eater
+>**Prompt:** Hey Analyst, I've never seen an executable icon that looks like this. I don't like things I'm not familiar with. Can you check it out and see what it's doing?
+
+This was took me too long. The malware in question was a .exe, which I hadn't analyzed before. My first thought was to drop it into Ghidra, and decompile it to try to figure out what it was doing.
+
+I played around with that for quite a while, but it turns out I need a lot more practice with Ghidra becuase I didn't understand how to use it very well. Making a note to go learn this.
+
+So I went back to the start. I ran `file` on it to ensure it was actually an exe, which it was. Then I ran `strings` on it to see if the flag was just hidden in plain sight. It wasn't, but I did notice that it was built from python3-11.
+
+So I went online and found a python decompiler that gave me a .pyc file. This was essentially just byte code. I searched around github to find `pycdc` which should have been able to decode the byte code, but I kept getting errors. I tried multiple decompilers with that same.
+
+Eventually, I downloaded Procmon, and ran the sample while capturing. There was a lot to sort through. I used the search function to find `flag{` and procmon highlighted one event. Turns out the sample was creating a file that contained the flag in its name.

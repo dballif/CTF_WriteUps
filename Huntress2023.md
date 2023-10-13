@@ -565,3 +565,37 @@ So I went back to the start. I ran `file` on it to ensure it was actually an exe
 So I went online and found a python decompiler that gave me a .pyc file. This was essentially just byte code. I searched around github to find `pycdc` which should have been able to decode the byte code, but I kept getting errors. I tried multiple decompilers with that same.
 
 Eventually, I downloaded Procmon, and ran the sample while capturing. There was a lot to sort through. I used the search function to find `flag{` and procmon highlighted one event. Turns out the sample was creating a file that contained the flag in its name.
+
+### Opendir
+>**Prompt:** A threat actor exposed an open directory on the public internet! We could explore their tools for some further intelligence. Can you find a flag they might be hiding?
+
+Also, don't forget to login opendir:opendir.
+
+Okay, so my first instinct here was to just start looking thorugh all the different directories to see if there were any suspipciously named files or directories. A quick glance didn't reveal anything especially promising.
+
+Next, I noticed that there were a lot of .txt files among all the .exe and .bat files. So before I started downloading any malware to start analyzing, I just went through each .txt and .html file searching for a 'flag' or any suspcious base64 strings. `Ctrl+F` was my friend.
+
+Luckily for me, in one of the files, nestled in a subdirectory, I found the flag in plain text. This was good news because there was a lot of encrypted text throughout.
+
+### Under The Bridge
+>**Prompt:** Can you find this iconic location?
+
+The link provided for osint.golf has another "Geoguesser" style problem. We are dropped into a Google Maps street view and must find where we are based off the clues we can see from that spot.
+
+A quick look around showed parking signs and warnings in English. So we are probably in an English speaking country.
+
+The look around also showed a few business signs:
+- "SHURGARD SELF-STORAGE"
+- FlashPark (On a parking spot sign)
+
+I followed the Shurgard clue. A quick google search showed that Shurgard is a European storage company that has locations in Belgium, Denmark, France, Germany, Sweden, the Netherlands, the UK, and the US.
+
+So I see two main english speaking countries here, the UK and the US. To narrow it down between these two, I turned to the traffic signs I saw earlier. Two things stuck out:
+1. I do not recognize them as US signs
+2. The bridge height sign is in meters(m) not feet.
+
+Okay, so I'm in the UK somewhere. I pulled up google maps and search for Shurgard in the UK. There are a fair amount of them that show up, most of them in and around London. I checked a few of the outer ones to narrow down to London specifically.
+
+Then I started looking for Shurgards that were located adjacent to bridges. Specifically bridges over small streets. A lot of the possibilities were located near bridges over major highways. This significantly narrowed things down.
+
+I started just going through them until I found the right one. I dropped my pin on the small map there and got the flag.

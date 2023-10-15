@@ -599,3 +599,42 @@ Okay, so I'm in the UK somewhere. I pulled up google maps and search for Shurgar
 Then I started looking for Shurgards that were located adjacent to bridges. Specifically bridges over small streets. A lot of the possibilities were located near bridges over major highways. This significantly narrowed things down.
 
 I started just going through them until I found the right one. I dropped my pin on the small map there and got the flag.
+
+### Opposable Thumbs
+>**Prompt:** We uncovered a database. Perhaps the flag is right between your fingertips!
+
+The file downloaded is called thumbcache_256.db.
+
+I didn't know what a thumbcache was so I looked at it. It is short for Thumbnail cache. Which is a database that is used by windows to store thumbnail images.
+
+I downloaded  a (thumbcache viewer)[https://thumbcacheviewer.github.io/] (use at your own risk, I know nothing about this). Which basically just opens the databases and lets you scroll through the contents.
+
+None of the names were interesting, but scrolling through I was able to see thumbnails. The thumbnail for '3fa8aafdd63e1168.jpg' contained the flag.
+
+### Land Before Time
+>**Prompt:** This trick is nothing new, you know what to do: iSteg. Look for the tail that's older than time, this Spike, you shouldn't climb.
+
+Another steganogrpahy problem. I started out by finding iSteg since it was mentioned by name. I found it at (this repo)[https://github.com/rafiibrahim8/iSteg] and downloaded the CLI version.
+
+```
+java -jar iSteg-v2.01_CLI.jar
+
+iSteg CLI v-2.01
+Enter your choice:
+        1. Hide a file with Steg
+        2. Hide a message with Steg
+        3. Extract stuff from Steg
+        Enter any things to exit.
+
+3
+Enter file name with extension:
+dinosaurs1.png
+Password (Press enter if the steganographic data wasn't encrypted):
+
+Message extraction successful. The text is:
+
+flag{------------------------}
+```
+
+Pretty simple because I just used the tool they called out.
+

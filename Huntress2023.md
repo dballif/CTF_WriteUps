@@ -1,13 +1,12 @@
 # Huntress CTF 2023
 
 ## Intro
-These are my write ups for the Huntress CTF 2023 challenges. I've already finished a few of the beginner challenges, so I'll go ahead and sum them up, but they may not be as detailed as the rest. The CTF runs the entire month of October, but the challenges are released in batches once a day.
-
-When the challenge is over, I'll update the results section with my standing
+These are my write ups for the Huntress CTF 2023 challenges. The CTF ran the entire month of October, but the challenges are released in batches once a day. Unfortunately, life got really busy at the end of the month, and I was unable to finish all of the challenges this year, but I had a lot of fun and learned a ton. I'm really looking forward to next years CTF. Hopefully I'll start working on some CTFs that I can drop in here as well.
 
 ## Results
 10/6 @ 10:15AM (Mountain) - 89th Place
 10/7 - 17th Place
+Final: 
 
 ## Challenges
 
